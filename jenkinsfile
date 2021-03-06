@@ -10,7 +10,7 @@ pipeline{
             steps{
                 ansiblePlaybook credentialsId: 'privatekey', 
                 disableHostKeyChecking: true, 
-                installation: 'projCert', 
+                installation: 'myansible', 
                 inventory: 'dev.inv', 
                 playbook: 'assignment.yml'
             }
