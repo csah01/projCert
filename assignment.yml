@@ -1,0 +1,29 @@
+---
+- hosts: webservers
+  become: true
+  become_user: root
+  vars:
+   git_repo: https://github.com/csah01/projCert.git
+   proj_root: /tmp/projectcert
+  tasks:
+  - name: Install git and docker
+    yum: name="{{item}}" state=present
+    loop:
+    - docker
+    - git
+    - epel-release
+    - nginx
+  - name: start nginx
+    service: name=nginx state=started
+  - name: start docker
+    service: name=docker state=started
+  - name: clone the repository
+    git: repo={{git_repo}} dest={{proj_root}}
+  - name: build the dockerfile
+    command: chdir={{proj_root}} docker build -t myproject:cert ./projCert
+  - name: run the image
+    command: docker run -d --name myproj -p 80:30080 myproject:cert
+    notify: restart nginx
+  handlers:
+  - name: restart nginx
+    service: name=nginx state=restart
